@@ -51,6 +51,12 @@ function TurnOnToggle2() {
     if (link) {
       link.textContent = 'Discover';
     }
+
+    var headerElement = document.querySelector(".games-list-header h1");
+
+    if (headerElement) {
+      headerElement.textContent = "Discover";
+    }
   }
 
   const observer = new MutationObserver(renameLink);
