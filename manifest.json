@@ -1,6 +1,6 @@
 {
-    "name": "BAD ROBLOX UPDATE REVERTER",
-    "description": "Helps Revert Bad Roblox Website Updates",
+    "name": "Roblox Website Tweaks",
+    "description": "Tweaks the roblox website to make the user experience more enjoyable and more customizable.",
     "version": "1.0",
     "manifest_version": 3,
     "action": {
@@ -10,11 +10,9 @@
     "permissions": [
         "activeTab",
         "storage",
-        "tabs"
+        "tabs",
+        "notifications"
     ],
-    "background": {
-    "service_worker": "background.js"
-    },
     "content_scripts": [
         {
         "matches": ["*://*.roblox.com/*"],

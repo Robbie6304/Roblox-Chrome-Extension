@@ -3,9 +3,10 @@
 <head>
   <title>Toggle Buttons</title>
   <style>
+
     html {
-      height: 325px;
-      width: 400px;      
+        height: 335px;
+        width: 400px;
     }
 
     .switch {
@@ -71,13 +72,16 @@
   </style>
 </head>
 <body>
+  <h1>GitHub Commit Notifier</h1>
+  <div id="message" class="message">Checking for new commits...</div>
+
   <h1>Roblox Website Settings</h1>
   <div class="toggle-container">
     <label class="switch">
       <input type="checkbox" id="toggle1">
       <span class="slider round"></span>
     </label>
-    <span class="toggle-label">16:9 Thumbnail Player Count</span>
+    <span class="toggle-label">Show player count on games with 16:9 Thumbnails</span>
   </div>
   <div class="toggle-container">
     <label class="switch">
@@ -91,14 +95,28 @@
       <input type="checkbox" id="toggle3">
       <span class="slider round"></span>
     </label>
-    <span class="toggle-label">Revert New Font</span>
+    <span class="toggle-label">Revert the new website font</span>
   </div>
   <div class="toggle-container">
     <label class="switch">
       <input type="checkbox" id="toggle4">
       <span class="slider round"></span>
     </label>
-    <span class="toggle-label">Hide Credit if under $1.00</span>
+    <span class="toggle-label">Hide Credit if you have under $1.00</span>
+  </div>
+  <div class="toggle-container">
+    <label class="switch">
+      <input type="checkbox" id="toggle5">
+      <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Remove blog posts on the left side of home</span>
+  </div>
+  <div class="toggle-container">
+    <label class="switch">
+      <input type="checkbox" id="toggle6">
+      <span class="slider round"></span>
+    </label>
+    <span class="toggle-label">Remove the Get Premium button on the left side of home</span>
   </div>
   <script src="main.js"></script>
 </body>

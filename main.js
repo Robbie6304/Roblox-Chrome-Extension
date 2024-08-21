@@ -1,9 +1,14 @@
+const repoOwner = 'Robbie6304';  // Replace with the repository owner's username
+const repoName = 'Roblox-Chrome-Extension';    // Replace with the repository name
+const checkInterval = 60 * 1000;      // Check every minute (60,000 ms)
+let lastCommitSha = '';
+
 (function() {
   'use strict';
 
   const toggles = document.querySelectorAll('input[type="checkbox"]');
   
-  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4'], function(result) {
+  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4', 'toggle5', 'toggle6'], function(result) {
     toggles.forEach(toggle => {
       toggle.checked = result[toggle.id] || false;
     });
@@ -22,6 +27,14 @@
 
     if (result.toggle4) {
       TurnOnToggle4();
+    }
+
+    if (result.toggle5) {
+      TurnOnToggle5();
+    }
+
+    if (result.toggle6) {
+      TurnOnToggle6();
     }
   });
 
@@ -152,7 +165,7 @@ function TurnOnToggle1() {
                 }
                 GetInfo();
               }
-            }
+          }
       }
   }
   
@@ -195,3 +208,48 @@ function TurnOnToggle4() {
   }, 250);
 };
 
+function TurnOnToggle5() {
+  const element = document.getElementById("upgrade-now-button");
+  
+  if (element) { 
+    document.getElementById("btr-blogfeed").remove();
+  }
+};
+
+function TurnOnToggle6() {
+  const intervalId = setInterval(() => {
+      const element = document.getElementById("upgrade-now-button");
+      
+      if (element) {
+          element.remove();
+          
+          clearInterval(intervalId);
+      }
+  }, 10);
+
+  //---------------------------------------------------------------------------------------------------
+
+  async function checkForNewCommits() {
+    try {
+        const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/commits`);
+        if (!response.ok) throw new Error('Failed to fetch commits');
+
+        const commits = await response.json();
+        const latestCommitSha = commits[0].sha;
+
+        chrome.storage.local.get(['latestCommitSha'], (result) => {
+            const storedCommitSha = result.latestCommitSha;
+
+            if (latestCommitSha !== storedCommitSha) {
+                chrome.storage.local.set({ latestCommitSha });
+                chrome.action.setBadgeText({ text: 'Update!' });
+                chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
+            }
+        });
+    } catch (error) {
+        console.error('Error checking for new commits:', error);
+    }
+  }
+  
+  checkForNewCommits();
+};
