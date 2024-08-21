@@ -1,8 +1,3 @@
-const repoOwner = 'Robbie6304';  // Replace with the repository owner's username
-const repoName = 'Roblox-Chrome-Extension';    // Replace with the repository name
-const checkInterval = 60 * 1000;      // Check every minute (60,000 ms)
-let lastCommitSha = '';
-
 (function() {
   'use strict';
 
@@ -226,30 +221,4 @@ function TurnOnToggle6() {
           clearInterval(intervalId);
       }
   }, 10);
-
-  //---------------------------------------------------------------------------------------------------
-
-  async function checkForNewCommits() {
-    try {
-        const response = await fetch(`https://api.github.com/repos/${repoOwner}/${repoName}/commits`);
-        if (!response.ok) throw new Error('Failed to fetch commits');
-
-        const commits = await response.json();
-        const latestCommitSha = commits[0].sha;
-
-        chrome.storage.local.get(['latestCommitSha'], (result) => {
-            const storedCommitSha = result.latestCommitSha;
-
-            if (latestCommitSha !== storedCommitSha) {
-                chrome.storage.local.set({ latestCommitSha });
-                chrome.action.setBadgeText({ text: 'Update!' });
-                chrome.action.setBadgeBackgroundColor({ color: '#FF0000' });
-            }
-        });
-    } catch (error) {
-        console.error('Error checking for new commits:', error);
-    }
-  }
-  
-  checkForNewCommits();
 };
