@@ -3,7 +3,7 @@
 
   const toggles = document.querySelectorAll('input[type="checkbox"]');
   
-  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4', 'toggle5', 'toggle6'], function(result) {
+  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4', 'toggle5', 'toggle6', 'toggle7'], function(result) {
     toggles.forEach(toggle => {
       toggle.checked = result[toggle.id] || false;
     });
@@ -30,6 +30,10 @@
 
     if (result.toggle6) {
       TurnOnToggle6();
+    }
+
+    if (result.toggle7) {
+      TurnOnToggle7();
     }
   });
 
@@ -222,3 +226,50 @@ function TurnOnToggle6() {
       }
   }, 10);
 };
+
+function TurnOnToggle7() {
+  const intervalId = setInterval(() => {
+    const metaTag = document.querySelector('meta[name="user-data"]');
+    
+    if (metaTag) {
+      clearInterval(intervalId);
+
+      const userId = metaTag.getAttribute('data-userid');
+      
+      if (window.location.href.includes("/badges/")) {
+        const badgeId = window.location.href.match(/\/badges\/(\d+)\//)[1];
+        
+        const apiUrl = `https://badges.roblox.com/v1/users/${userId}/badges/awarded-dates?badgeIds=${badgeId}`;
+        
+        fetch(apiUrl)
+          .then(response => response.json())
+          .then(data => {
+            console.log("Badge Awarded Data:", data);
+            
+            const awardedDate = data.data && data.data.length > 0
+              ? new Date(data.data[0].awardedDate).toLocaleDateString()
+              : "N/A";
+            
+            const newContent = document.createElement('div');
+            newContent.classList.add('clearfix', 'item-field-container');
+            newContent.innerHTML = `
+              <div class="font-header-1 text-label text-overflow field-label">Unlocked</div>
+              <span class="field-content btr-sales">${awardedDate}</span>
+            `;
+            
+            const itemDetailsDiv = document.getElementById('item-details');
+            if (itemDetailsDiv) {
+              itemDetailsDiv.appendChild(newContent);
+            } else {
+              console.warn("Element with id 'item-details' not found.");
+            }
+          })
+          .catch(error => console.error("Error fetching badge data:", error));
+      } else {
+        console.log("Not on a badge page.");
+      }
+    }
+  }, 100);
+}
+
+
