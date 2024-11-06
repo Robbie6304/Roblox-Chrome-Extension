@@ -280,11 +280,11 @@ function TurnOnToggle8() {
   setInterval(() => {
     const elements = document.querySelectorAll('.font-header-2.badge-stats-info');
 
-    elements.forEach(element => {
-        const num = element.textContent;
-        if (!num.includes(',') && !num.includes('%')) {
-            element.textContent = Number(num).toLocaleString();
-        }
-    });
-}, 500); // Check every 0.5 seconds
+      elements.forEach(element => {
+          const num = element.textContent;
+          if (!num.includes(',') && !num.includes('%')) {
+              element.textContent = Number(num).toLocaleString();
+          }
+      });
+  }, 500);
 };
