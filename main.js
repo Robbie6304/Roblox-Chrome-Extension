@@ -3,7 +3,7 @@
 
   const toggles = document.querySelectorAll('input[type="checkbox"]');
   
-  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4', 'toggle5', 'toggle6', 'toggle7'], function(result) {
+  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4', 'toggle5', 'toggle6', 'toggle7', 'toggle8'], function(result) {
     toggles.forEach(toggle => {
       toggle.checked = result[toggle.id] || false;
     });
@@ -34,6 +34,10 @@
 
     if (result.toggle7) {
       TurnOnToggle7();
+    }
+
+    if (result.toggle8) {
+      TurnOnToggle8();
     }
   });
 
@@ -272,4 +276,15 @@ function TurnOnToggle7() {
   }, 100);
 }
 
+function TurnOnToggle8() {
+  setInterval(() => {
+    const elements = document.querySelectorAll('.font-header-2.badge-stats-info');
 
+    elements.forEach(element => {
+        const num = element.textContent;
+        if (!num.includes(',') && !num.includes('%')) {
+            element.textContent = Number(num).toLocaleString();
+        }
+    });
+}, 500); // Check every 0.5 seconds
+};
