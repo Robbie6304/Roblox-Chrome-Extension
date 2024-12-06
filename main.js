@@ -105,43 +105,44 @@ function TurnOnToggle1() {
       }
   }
   
-  function Delay2() {
-      if (Count != Total) {
-          setTimeout(Delay2, 100);
-      } else {
-          const batchSize = 5;
-          const delayBetweenBatches = 100;
-  
-          for (let i = 0; i < Universes.length; i += batchSize) {
-              const chunk = Universes.slice(i, i + batchSize);
-              const filteredChunk = chunk.filter(id => !RequestedUniverses.has(id))
-  
-              if (filteredChunk.length === 0) {
-                  continue;
-              }
-  
-              let xhr = new XMLHttpRequest();
-              let params = JSON.stringify(filteredChunk).replace('[', "").replace("]", "").replaceAll('"', '').replaceAll("'", "");
-              xhr.open("GET", "https://games.roblox.com/v1/games?universeIds=" + params);
-              xhr.send();
-  
-              filteredChunk.forEach(id => RequestedUniverses.add(id));
-  
-              function check1() {
-                  if (xhr.readyState !== 4) {
-                      window.setTimeout(check1, delayBetweenBatches);
-                  } else if (xhr.status === 200) {
-                      let loaded = JSON.parse(xhr.response);
-                      for (let info of loaded.data) {
-                          GameCounts[info.id] = info.playing;
-                      }
-                  } else {
-                      console.error('Request failed with status: ' + xhr.status);
-                  }
-              }
-              check1();
-          }
-      }
+  async function Delay2() {
+    if (Count != Total) {
+        setTimeout(Delay2, 100);
+    } else {
+        const batchSize = 10;
+        const delayBetweenBatches = 1500;
+
+        for (let i = 0; i < Universes.length; i += batchSize) {
+            const chunk = Universes.slice(i, i + batchSize);
+            const filteredChunk = chunk.filter(id => !RequestedUniverses.has(id));
+
+            if (filteredChunk.length === 0) continue;
+
+            const params = filteredChunk.join(",");
+            const url = `https://games.roblox.com/v1/games?universeIds=${encodeURIComponent(params)}`;
+
+            try {
+                const response = await fetch(url);
+                if (response.status === 200) {
+                    const data = await response.json();
+                    for (const info of data.data) {
+                        GameCounts[info.id] = info.playing;
+                    }
+                } else if (response.status === 429) {
+                    console.warn('Rate limit reached. Retrying after delay...');
+                    await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+                    i -= batchSize;
+                } else {
+                    console.error('Request failed with status: ' + response.status);
+                }
+            } catch (error) {
+                console.error('Network error:', error);
+            }
+
+            filteredChunk.forEach(id => RequestedUniverses.add(id));
+            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
+        }
+    }
   }
   
   function AddPlayerCounts(games) {
