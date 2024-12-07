@@ -3,19 +3,22 @@
     "description": "Tweaks the roblox website to make the user experience more enjoyable and more customizable.",
     "version": "1.0",
     "manifest_version": 3,
+    
     "action": {
       "default_popup": "structure.html",
-      "default_icon": "BadRoblox.png"
+      "default_icon": "ExtensionIcon.png"
     },
+
     "permissions": [
         "activeTab",
         "storage",
         "tabs"
     ],
+
     "content_scripts": [
         {
-        "matches": ["*://*.roblox.com/*"],
-        "js": ["main.js"]
+            "matches": ["*://*.roblox.com/*"],
+            "js": ["main.js"]
         }
     ]
 }
