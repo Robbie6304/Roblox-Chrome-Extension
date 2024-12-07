@@ -105,46 +105,69 @@ function TurnOnToggle1() {
       }
   }
   
-  async function Delay2() {
-    if (Count != Total) {
-        setTimeout(Delay2, 100);
-    } else {
-        const batchSize = 10;
-        const delayBetweenBatches = 1500;
+  async function exponentialBackoffRetry(attempt) {
+      const MinDelay = 2000
+      const MaxDelay = 60000
 
-        for (let i = 0; i < Universes.length; i += batchSize) {
-            const chunk = Universes.slice(i, i + batchSize);
-            const filteredChunk = chunk.filter(id => !RequestedUniverses.has(id));
-
-            if (filteredChunk.length === 0) continue;
-
-            const params = filteredChunk.join(",");
-            const url = `https://games.roblox.com/v1/games?universeIds=${encodeURIComponent(params)}`;
-
-            try {
-                const response = await fetch(url);
-                if (response.status === 200) {
-                    const data = await response.json();
-                    for (const info of data.data) {
-                        GameCounts[info.id] = info.playing;
-                    }
-                } else if (response.status === 429) {
-                    console.warn('Rate limit reached. Retrying after delay...');
-                    await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
-                    i -= batchSize;
-                } else {
-                    console.error('Request failed with status: ' + response.status);
-                }
-            } catch (error) {
-                console.error('Network error:', error);
-            }
-
-            filteredChunk.forEach(id => RequestedUniverses.add(id));
-            await new Promise(resolve => setTimeout(resolve, delayBetweenBatches));
-        }
-    }
+      const delay = Math.min(MinDelay * Math.pow(2, attempt), MaxDelay);
+      console.warn(`Rate limit reached. Retrying in ${delay / 1000} seconds...`);
+      await new Promise(resolve => setTimeout(resolve, delay));
   }
-  
+
+  async function Delay2() {
+      if (Count != Total) {
+          setTimeout(Delay2, 100);
+      } else {
+          const batchSize = 20;
+          const maxRetries = 5;
+
+          for (let i = 0; i < Universes.length; i += batchSize) {
+              const chunk = Universes.slice(i, i + batchSize);
+              const filteredChunk = chunk.filter(id => !RequestedUniverses.has(id));
+
+              if (filteredChunk.length === 0) continue;
+
+              const params = filteredChunk.join(",");
+              const url = `https://games.roblox.com/v1/games?universeIds=${encodeURIComponent(params)}`;
+
+              let success = false;
+              let attempts = 0;
+
+              while (!success && attempts < maxRetries) {
+                  try {
+                      const response = await fetch(url);
+
+                      if (response.status === 200) {
+                          const data = await response.json();
+                          for (const info of data.data) {
+                              GameCounts[info.id] = info.playing;
+                          }
+                          success = true;
+                      } else if (response.status === 429) {
+                          console.warn('Rate limit hit, retrying...');
+                          await exponentialBackoffRetry(attempts);
+                          attempts++;
+                      } else {
+                          console.error('Request failed with status: ' + response.status);
+                          break;
+                      }
+                  } catch (error) {
+                      console.error('Network error:', error);
+                      break;
+                  }
+              }
+
+              if (!success) {
+                  console.error(`Failed to process chunk: ${filteredChunk.join(",")}`);
+              }
+
+              filteredChunk.forEach(id => RequestedUniverses.add(id));
+              
+              await new Promise(resolve => setTimeout(resolve, 10000));
+          }
+      }
+  }
+
   function AddPlayerCounts(games) {
       Total = games.length;
       setTimeout(Delay2, 5);
@@ -167,6 +190,7 @@ function TurnOnToggle1() {
                     card.innerHTML = card.innerHTML + '<span class="info-label playing-counts-label">' + playing + '</span></div>';
                   }
                 }
+                
                 GetInfo();
               }
           }
