@@ -2,44 +2,27 @@
   'use strict';
 
   const toggles = document.querySelectorAll('input[type="checkbox"]');
-  
-  chrome.storage.sync.get(['toggle1', 'toggle2', 'toggle3', 'toggle4', 'toggle5', 'toggle6', 'toggle7', 'toggle8'], function(result) {
-    toggles.forEach(toggle => {
-      toggle.checked = result[toggle.id] || false;
-    });
-    
-    if (result.toggle1) {
-      TurnOnToggle1();
-    }
 
-    if (result.toggle2) {
-      TurnOnToggle2();
-    }
+  chrome.storage.sync.get(
+    [
+      'toggle1', 'toggle2', 'toggle3', 'toggle4',
+      'toggle5', 'toggle6', 'toggle7', 'toggle8', 'toggle9'
+    ],
+    function (result) {
+      toggles.forEach(toggle => {
+        toggle.checked = result[toggle.id] || false;
+      });
 
-    if (result.toggle3) {
-      TurnOnToggle3();
+      Object.keys(result).forEach(key => {
+        if (result[key]) {
+          const functionName = `TurnOn${key.charAt(0).toUpperCase() + key.slice(1)}`;
+          if (typeof window[functionName] === 'function') {
+            window[functionName]();
+          }
+        }
+      });
     }
-
-    if (result.toggle4) {
-      TurnOnToggle4();
-    }
-
-    if (result.toggle5) {
-      TurnOnToggle5();
-    }
-
-    if (result.toggle6) {
-      TurnOnToggle6();
-    }
-
-    if (result.toggle7) {
-      TurnOnToggle7();
-    }
-
-    if (result.toggle8) {
-      TurnOnToggle8();
-    }
-  });
+  );
 
   toggles.forEach(toggle => {
     toggle.addEventListener('change', () => {
@@ -310,6 +293,28 @@ function TurnOnToggle8() {
           if (!num.includes(',') && !num.includes('%')) {
               element.textContent = Number(num).toLocaleString();
           }
-      });
+        });
   }, 500);
 };
+
+function TurnOnToggle9() {
+  const intervalId = setInterval(() => {
+      const element = document.querySelector(".game-sort-carousel-wrapper");
+      
+      if (element) {
+          element.remove();
+          
+          clearInterval(intervalId);
+      }
+  }, 10);
+
+  const intervalId2 = setInterval(() => {
+    const element = document.querySelector('[data-testid="home-page-game-grid"]');
+    
+      if (element) {
+          element.remove();
+          
+          clearInterval(intervalId2);
+      }
+  }, 10);
+}
