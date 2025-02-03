@@ -298,16 +298,22 @@ function TurnOnToggle8() {
 
 function TurnOnToggle9() {
   const intervalId = setInterval(() => {
-    const elements = document.querySelectorAll(
-      '.game-carousel.wide-game-tile-carousel.scrollable-carousel.home-page-carousel, ' +
-      '.game-grid.home-game-grid.wide-game-tile-game-grid.expand-home-content'
-    );
+    const wrappers = document.querySelectorAll('.game-sort-carousel-wrapper');
+    
+    wrappers.forEach(wrapper => {
+      if (wrapper.textContent.includes("Today's Picks")) {
+        wrapper.remove();
 
-    if (elements.length > 0) {
-      elements.forEach(element => element.remove());
-      clearInterval(intervalId);
-    }
-  }, 10);
+        clearInterval(intervalId);
+
+        const friendCarousel = document.querySelector('.friend-carousel-container');
+
+        if (friendCarousel && friendCarousel.nextElementSibling) {
+          friendCarousel.nextElementSibling.remove(); //February 3, 2025 - roblox released a very weird update that changed the homepage and broke the previous code, this may be temporary.
+        }
+      }
+    });
+  }, 500);
 }
 
 function TurnOnToggle10() {
