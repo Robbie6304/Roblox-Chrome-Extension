@@ -6,7 +6,8 @@
   chrome.storage.sync.get(
     [
       'toggle1', 'toggle2', 'toggle3', 'toggle4',
-      'toggle5', 'toggle6', 'toggle7', 'toggle8', 'toggle9'
+      'toggle5', 'toggle6', 'toggle7', 'toggle8', 
+      'toggle9', 'toggle10'
     ],
     function (result) {
       toggles.forEach(toggle => {
@@ -277,8 +278,6 @@ function TurnOnToggle7() {
             }
           })
           .catch(error => console.error("Error fetching badge data:", error));
-      } else {
-        console.log("Not on a badge page.");
       }
     }
   }, 100);
@@ -299,22 +298,59 @@ function TurnOnToggle8() {
 
 function TurnOnToggle9() {
   const intervalId = setInterval(() => {
-      const element = document.querySelector(".game-sort-carousel-wrapper");
-      
-      if (element) {
-          element.remove();
-          
-          clearInterval(intervalId);
-      }
-  }, 10);
+    const elements = document.querySelectorAll(
+      '.game-carousel.wide-game-tile-carousel.scrollable-carousel.home-page-carousel, ' +
+      '.game-grid.home-game-grid.wide-game-tile-game-grid.expand-home-content'
+    );
 
-  const intervalId2 = setInterval(() => {
-    const element = document.querySelector('[data-testid="home-page-game-grid"]');
-    
-      if (element) {
-          element.remove();
-          
-          clearInterval(intervalId2);
-      }
+    if (elements.length > 0) {
+      elements.forEach(element => element.remove());
+      clearInterval(intervalId);
+    }
   }, 10);
+}
+
+function TurnOnToggle10() {
+  if (window.location.href.includes("/catalog/")) {
+    const badgeId = window.location.href.match(/\/catalog\/(\d+)\//)[1];
+
+    const apiUrl = `https://economy.roblox.com/v2/assets/${badgeId}/details`;
+
+    fetch(apiUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log(apiUrl);
+        console.log("catalog Data:", data);
+
+        setTimeout(() => {
+          const createdDate = data.Created
+            ? new Date(data.Created).toLocaleDateString()
+            : "N/A";
+          const updatedDate = data.Updated
+            ? new Date(data.Updated).toLocaleDateString()
+            : "N/A";
+
+          const newContent = document.createElement('div');
+          newContent.classList.add('clearfix', 'item-field-container');
+          newContent.innerHTML = `
+              <div class="clearfix item-info-row-container"><div class="font-header-1 text-subheader text-label text-overflow row-label">Created</div><span id="type-content" class="font-body text wait-for-i18n-format-render">${createdDate}</span></div>
+          `;
+
+          const newContent2 = document.createElement('div');
+          newContent2.classList.add('clearfix', 'item-field-container');
+          newContent2.innerHTML = `
+              <div class="clearfix item-info-row-container"><div class="font-header-1 text-subheader text-label text-overflow row-label">Updated</div><span id="type-content" class="font-body text wait-for-i18n-format-render">${updatedDate}</span></div>
+          `;
+
+          const itemDetailsDiv = document.getElementById('item-details');
+          if (itemDetailsDiv) {
+            itemDetailsDiv.appendChild(newContent);
+            itemDetailsDiv.appendChild(newContent2);
+          } else {
+            console.warn("Element with id 'item-details' not found.");
+          }
+        }, 500);
+      })
+      .catch(error => console.error("Error fetching badge data:", error));
+  }
 }
