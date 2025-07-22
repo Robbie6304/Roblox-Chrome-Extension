@@ -45,25 +45,144 @@
   });
 })();
 
-function TurnOnToggle2() { 
-  function renameLink() {
-    const link = document.querySelector('a.font-header-2.nav-menu-title.text-header.charts-rename-exp-treatment[href="/charts"]');
-    if (link) {
-      link.textContent = 'Discover';
+function TurnOnToggle2() {
+  const renameBuzzwords = () => {
+    document.querySelectorAll("h2").forEach(h2 => {
+      if (h2.textContent.includes("Connections")) {
+        const textNode = Array.from(h2.childNodes).find(
+          node => node.nodeType === Node.TEXT_NODE && node.textContent.includes("Connections")
+        );
+        if (textNode) {
+          textNode.textContent = textNode.textContent.replace("Connections", "Friends");
+        }
+      }
+    });
+
+    document.querySelectorAll("div.container-header h1.friends-title").forEach(h1 => {
+      if (h1.textContent.includes("My Connections")) {
+        h1.textContent = h1.textContent.replace("My Connections", "My Friends");
+      }
+    });
+
+    document.querySelectorAll("span.text-lead").forEach(span => {
+      if (span.textContent.trim() === "Connections") {
+        span.textContent = "Friends";
+      }
+    });
+
+    document.querySelectorAll(".profile-header-social-count-label").forEach(span => {
+      if (span.textContent.trim() === "Connections") {
+        span.textContent = "Friends";
+      }
+    });
+
+    document.querySelectorAll("input.friends-filter-searchbar-input").forEach(input => {
+      if (input.placeholder === "Search Connections") {
+        input.placeholder = "Search Friends";
+      }
+    });
+
+    if (document.title.includes("Connections")) {
+      document.title = document.title.replace("Connections", "Friends");
     }
 
-    var headerElement = document.querySelector(".games-list-header h1");
+    document.querySelectorAll("span.web-blox-css-tss-1283320-Button-textContainer").forEach(span => {
+      const text = span.textContent.trim();
+      if (text === "Remove Connection") {
+        span.textContent = "Unfriend";
+      } else if (text === "Add Connection") {
+        span.textContent = "Add Friend";
+      }
+    });
 
-    if (headerElement) {
-      headerElement.textContent = "Discover";
+    document.querySelectorAll("span.font-header-2.dynamic-ellipsis-item").forEach(span => {
+      if (span.textContent.trim() === "Connect") {
+        span.textContent = "Friends";
+      }
+      if (span.getAttribute("title") === "Connect") {
+        span.setAttribute("title", "Friends");
+      }
+    });
+
+    // ------- code below handles renaming whatever the hell Chart is -> Discover
+
+    document.querySelectorAll("a.btr-nav-node-header_charts_rename").forEach(a => {
+      if (a.textContent.trim() === "Charts") {
+        a.textContent = "Discover";
+      }
+    });
+
+    document.querySelectorAll("div.games-list-header h1").forEach(h1 => {
+    if (h1.textContent.trim() === "Charts") {
+      h1.textContent = "Discover";
     }
-  }
+  });
 
-  const observer = new MutationObserver(renameLink);
+  document.querySelectorAll("a.font-header-2.nav-menu-title.text-header").forEach(a => {
+    if (a.textContent.trim() === "Charts") {
+      a.textContent = "Discover";
+    }
+  });
 
+
+  // ------- code below handles renaming Communities -> Groups
+
+  document.querySelectorAll("h1.groups-list-heading").forEach(h1 => {
+    if (h1.textContent.trim() === "Communities") {
+      h1.textContent = "Groups";
+    }
+  });
+
+  document.querySelectorAll("span.font-header-2.dynamic-ellipsis-item").forEach(span => {
+    if (span.textContent.trim() === "Communities") {
+      span.textContent = "Groups";
+    }
+    if (span.getAttribute("title") === "Communities") {
+      span.setAttribute("title", "Groups");
+    }
+  });
+
+  document.querySelectorAll("input.groups-list-search-input").forEach(input => {
+    if (input.placeholder === "Search My Communities") {
+      input.placeholder = "Search My Groups";
+    }
+  });
+
+  document.querySelectorAll("span.linkable-button-content-container").forEach(span => {
+    if (span.textContent.trim() === "Create Community") {
+      span.textContent = "Create Group";
+    }
+  });
+
+  document.querySelectorAll("li.contextual-menu-actions-menu-item").forEach(li => {
+    if (li.textContent.trim().startsWith("Leave Community")) {
+      li.firstChild.textContent = "Leave Group";
+    }
+  });
+
+  document.querySelectorAll("a.btn-secondary-xs.btn-more.see-all-link-icon").forEach(a => {
+    if (a.textContent.trim() === "Back to Community") {
+      a.textContent = "Back to Group";
+    }
+  });
+
+  document.querySelectorAll("span.ng-binding").forEach(span => {
+    if (span.textContent.trim() === "Community Funds:") {
+      span.textContent = "Group Funds:";
+    }
+  });
+
+  document.querySelectorAll("li.contextual-menu-actions-menu-item").forEach(li => {
+    if (li.textContent.trim().startsWith("Configure Community")) {
+      li.firstChild.textContent = "Configure Group";
+    }
+  });
+  };
+
+  renameBuzzwords();
+
+  const observer = new MutationObserver(() => renameBuzzwords());
   observer.observe(document.body, { childList: true, subtree: true });
-
-  window.addEventListener('load', renameLink);
 }
 
 function TurnOnToggle3() { 
@@ -297,19 +416,24 @@ function TurnOnToggle8() {
 };
 
 function TurnOnToggle9() {
+  let executed = false; // Prevent setTimeout from running multiple times
   const intervalId = setInterval(() => {
     const wrappers = document.querySelectorAll('.game-sort-carousel-wrapper');
     
     wrappers.forEach(wrapper => {
       if (wrapper.textContent.includes("Today's Picks")) {
         wrapper.remove();
-
         clearInterval(intervalId);
 
-        const friendCarousel = document.querySelector('.friend-carousel-container');
+        if (!executed) {
+          executed = true;
+          setTimeout(() => {
+            const friendCarousel = document.querySelector('.friend-carousel-container');
 
-        if (friendCarousel && friendCarousel.nextElementSibling) {
-          friendCarousel.nextElementSibling.remove(); //February 3, 2025 - roblox released a very weird update that changed the homepage and broke the previous code, this may be temporary.
+            if (friendCarousel && friendCarousel.nextElementSibling) {
+              friendCarousel.nextElementSibling.remove();
+            }
+          }, 500);
         }
       }
     });
