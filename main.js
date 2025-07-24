@@ -47,6 +47,8 @@
 
 function TurnOnToggle2() {
   const renameBuzzwords = () => {
+    //code below handles renaming Connections -> Friends
+
     document.querySelectorAll("h2").forEach(h2 => {
       if (h2.textContent.includes("Connections")) {
         const textNode = Array.from(h2.childNodes).find(
@@ -103,6 +105,18 @@ function TurnOnToggle2() {
         span.setAttribute("title", "Friends");
       }
     });
+
+    document.querySelectorAll("span.friends-carousel-display-name").forEach(span => {
+      if (span.textContent.trim() === "Connect") {
+        span.textContent = "Add Friends";
+      }
+    });
+
+    const tooltip = document.querySelector('#friendsTooltip .tooltip-inner');
+    if (tooltip && tooltip.textContent.includes("Connections")) {
+      tooltip.textContent = tooltip.textContent.replace("Connections", "Friends");
+    }
+
 
     // ------- code below handles renaming whatever the hell Chart is -> Discover
 
@@ -416,28 +430,30 @@ function TurnOnToggle8() {
 };
 
 function TurnOnToggle9() {
-  let executed = false; // Prevent setTimeout from running multiple times
-  const intervalId = setInterval(() => {
-    const wrappers = document.querySelectorAll('.game-sort-carousel-wrapper');
-    
-    wrappers.forEach(wrapper => {
-      if (wrapper.textContent.includes("Today's Picks")) {
-        wrapper.remove();
-        clearInterval(intervalId);
-
-        if (!executed) {
-          executed = true;
-          setTimeout(() => {
-            const friendCarousel = document.querySelector('.friend-carousel-container');
-
-            if (friendCarousel && friendCarousel.nextElementSibling) {
-              friendCarousel.nextElementSibling.remove();
-            }
-          }, 500);
-        }
+  setTimeout(() => {
+    const carouselObserver = new MutationObserver(() => {
+      const carousel = document.querySelector('.game-sort-carousel-wrapper');
+      if (carousel) {
+        carousel.remove();
+        console.log('Game sort carousel removed.');
+        carouselObserver.disconnect();
       }
     });
-  }, 500);
+
+    carouselObserver.observe(document.body, { childList: true, subtree: true });
+
+    const recommendedObserver = new MutationObserver(() => {
+      const section = document.querySelector('[data-testid="home-page-game-grid"]');
+      if (section) {
+        section.remove();
+        console.log('Recommended For You section removed.');
+        recommendedObserver.disconnect();
+      }
+    });
+
+    recommendedObserver.observe(document.body, { childList: true, subtree: true });
+    
+  }, 1000); // weird issues where the page gets deleted/doesn't load when this isnt here
 }
 
 function TurnOnToggle10() {
